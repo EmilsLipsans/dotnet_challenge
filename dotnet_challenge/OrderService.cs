@@ -3,7 +3,8 @@
 public class OrderService : IOrderService
 {
     private List<Order> _orders = new List<Order>();
-    private List<DnaTestingKit> _dnaTestingKits = new List<DnaTestingKit>() { };
+    private List<DnaTestingKit> _dnaTestingKits = new List<DnaTestingKit>();
+    public List<DnaTestingKit> DnaTestingKits => _dnaTestingKits;
 
     public OrderService()
     {
