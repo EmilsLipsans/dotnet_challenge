@@ -5,21 +5,14 @@ namespace dotnet_challenge_test;
 [TestClass]
 public class OrderServiceTests
 {
-    // test DnaTestKit data the user of the api would import before placing orders
-    List<Tuple<int, string, decimal>> _testingKits = new List<Tuple<int, string, decimal>>
-    {
-        Tuple.Create(1, "Basic Kit", 98.99m),
-        Tuple.Create(2, "Basic Kit+", 100.0m),
-        Tuple.Create(3, "Advanced Kit", 199.99m)
-    };
+    private const decimal DefaultKitPrice = 98.99M;
 
     // Using https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices as a guide i have implemented unit tests
     [TestMethod]
-    public void PlaceOrder_ValidInput_NoDiscount_ReturnsOrder()
+    public void PlaceOrder_ValidInput_ReturnsNoDiscountOrder()
     {
         // Arrange 
         OrderService orderService = new OrderService();
-        orderService.ImportDnaTestKitList(_testingKits);
 
         int customerId = 1;
 
@@ -32,11 +25,8 @@ public class OrderServiceTests
         // valid kitId exists in the dictionary
         int kitId = 1;
 
-        // kit price of kit where the kitId = 1
-        decimal kitPrice = _testingKits[kitId - 1].Item3;
-
         // expected total price calculation with no discounts 
-        decimal expectedTotalPrice = desiredAmount * kitPrice;
+        decimal expectedTotalPrice = desiredAmount * DefaultKitPrice;
 
         // Act
         Order order = orderService.PlaceOrder(customerId: customerId,
@@ -54,11 +44,10 @@ public class OrderServiceTests
     }
 
     [TestMethod]
-    public void PlaceOrder_ValidInput_5PercentDiscount_ReturnsOrder()
+    public void PlaceOrder_ValidInput_Returns5PercentDiscountOrder()
     {
         // Arrange 
         OrderService orderService = new OrderService();
-        orderService.ImportDnaTestKitList(_testingKits);
 
         int customerId = 1;
 
@@ -69,13 +58,10 @@ public class OrderServiceTests
         int desiredAmount = 10;
 
         // valid kitId exists in the dictionary
-        int kitId = 2;
-
-        // kit price of kit where the kitId = 2
-        decimal kitPrice = _testingKits[kitId - 1].Item3;
+        int kitId = 1;
 
         // expected total price calculation with 5% discount 
-        decimal expectedTotalPrice = (desiredAmount * kitPrice) * 0.95m;
+        decimal expectedTotalPrice = desiredAmount * DefaultKitPrice * 0.95M;
 
         // Act
         Order order = orderService.PlaceOrder(customerId: customerId,
@@ -93,11 +79,10 @@ public class OrderServiceTests
     }
 
     [TestMethod]
-    public void PlaceOrder_ValidInput_15PercentDiscount_ReturnsOrder()
+    public void PlaceOrder_ValidInput_Returns15PercentDiscountOrder()
     {
         // Arrange 
         OrderService orderService = new OrderService();
-        orderService.ImportDnaTestKitList(_testingKits);
 
         int customerId = 1;
 
@@ -108,13 +93,10 @@ public class OrderServiceTests
         int desiredAmount = 50;
 
         // valid kitId exists in the dictionary
-        int kitId = 2;
-
-        // kit price of kit where the kitId = 2
-        decimal kitPrice = _testingKits[kitId - 1].Item3;
+        int kitId = 1;
 
         // expected total price calculation with 15% discount 
-        decimal expectedTotalPrice = (desiredAmount * kitPrice) * 0.85m;
+        decimal expectedTotalPrice = desiredAmount * DefaultKitPrice * 0.85M;
 
         // Act
         Order order = orderService.PlaceOrder(customerId: customerId,
@@ -132,11 +114,10 @@ public class OrderServiceTests
     }
 
     [TestMethod]
-    public void GetCustomerOrders_ValidInput_HasOrders_ReturnsOrders()
+    public void GetCustomerOrders_HasOrders_ReturnsOrders()
     {
         // Arrange 
         OrderService orderService = new OrderService();
-        orderService.ImportDnaTestKitList(_testingKits);
 
         int customerId = 1;
 
@@ -147,26 +128,27 @@ public class OrderServiceTests
         int desiredAmount = 50;
 
         // valid kitId exists in the dictionary
-        int kitId = 2;
+        int kitId = 1;
 
         // kit price of kit where the kitId = 2
-        decimal kitPrice = _testingKits[kitId - 1].Item3;
 
         // expected total price calculation with 15% discount 
-        decimal expectedTotalPrice = (desiredAmount * kitPrice) * 0.85m;
+        int expectedOrderCount = 3;
 
-        // Act
-        Order order = orderService.PlaceOrder(customerId: customerId,
-            expectedDeliveryDate: expectedDeliveryDate,
-            desiredAmount: desiredAmount,
-            kitId: kitId);
-
-        // Assert that order has been created with all the passed in data
-        Assert.IsNotNull(order);
-        Assert.AreEqual(customerId, order.CustomerId);
-        Assert.AreEqual(expectedDeliveryDate, order.ExpectedDeliveryDate);
-        Assert.AreEqual(desiredAmount, order.Amount);
-        Assert.AreEqual(kitId, order.KitId);
-        Assert.AreEqual(expectedTotalPrice, order.TotalPrice);
+        List<Order> customerOrders;
+        // Act 
+        for (int i = 0; i < expectedOrderCount; i++)
+        {
+            orderService.PlaceOrder(customerId: customerId,
+                expectedDeliveryDate: expectedDeliveryDate,
+                desiredAmount: desiredAmount,
+                kitId: kitId);
+        }
+        
+        customerOrders = orderService.GetCustomerOrders(customerId);
+        
+        // Assert that customer has expected order count 
+        Assert.AreEqual(expectedOrderCount, customerOrders.Count);
+        
     }
 }
