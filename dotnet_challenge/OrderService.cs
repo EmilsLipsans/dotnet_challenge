@@ -3,7 +3,18 @@
 public class OrderService : IOrderService
 {
     private List<Order> _orders = new List<Order>();
-    private List<DnaTestingKit> _dnaTestingKits = new List<DnaTestingKit>();
+    private List<DnaTestingKit> _dnaTestingKits = new List<DnaTestingKit>() { };
+
+    public OrderService()
+    {
+        DnaTestingKit defaultKit = new DnaTestingKit
+        {
+            KitId = 1,
+            KitVariant = "default Kit",
+            BasePrice = 98.99M
+        };
+        _dnaTestingKits.Add(defaultKit);
+    }
 
     public Order PlaceOrder(int customerId, DateTime expectedDeliveryDate, int desiredAmount, int kitId)
     {
@@ -86,8 +97,6 @@ public class OrderService : IOrderService
             throw new ArgumentNullException(nameof(sourceData), "Source data cannot be null.");
         }
 
-        List<DnaTestingKit> copiedList = new List<DnaTestingKit>();
-
         foreach (var dataTuple in sourceData)
         {
             var kitId = dataTuple.Item1;
@@ -101,10 +110,13 @@ public class OrderService : IOrderService
                 BasePrice = basePrice
             };
 
-            copiedList.Add(copiedKit);
+            _dnaTestingKits.Add(copiedKit);
         }
+    }
 
-        _dnaTestingKits = new List<DnaTestingKit>(copiedList);
+    public void ClearDnaTestKitList()
+    {
+        _dnaTestingKits.Clear();
     }
 
     public List<Order> GetCustomerOrders(int customerId)
