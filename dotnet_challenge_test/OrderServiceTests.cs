@@ -54,7 +54,7 @@ public class OrderServiceTests
         // valid order delivery date is in the future
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
 
-        // valid amount is from 1 to 999. order where amount is 10-49  gets 5% discount
+        // valid amount is from 1 to 999. order where amount is 10-49 gets 5% discount
         int desiredAmount = 10;
 
         // valid kitId exists in the dictionary
@@ -124,18 +124,14 @@ public class OrderServiceTests
         // valid order delivery date is in the future
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
 
-        // valid amount is from 1 to 999. order where amount is 50 or more gets 15% discount
+        // valid amount is from 1 to 999. 
         int desiredAmount = 50;
 
         // valid kitId exists in the dictionary
         int kitId = 1;
-
-        // kit price of kit where the kitId = 2
-
-        // expected total price calculation with 15% discount 
+        
         int expectedOrderCount = 3;
 
-        List<Order> customerOrders;
         // Act 
         for (int i = 0; i < expectedOrderCount; i++)
         {
@@ -144,11 +140,23 @@ public class OrderServiceTests
                 desiredAmount: desiredAmount,
                 kitId: kitId);
         }
-        
-        customerOrders = orderService.GetCustomerOrders(customerId);
-        
+
+        var customerOrders = orderService.GetCustomerOrders(customerId);
+
         // Assert that customer has expected order count 
         Assert.AreEqual(expectedOrderCount, customerOrders.Count);
+    }
+    [TestMethod]
+    public void Clear_DnaTestKitList_ClearsList()
+    {
+        // Arrange 
+        OrderService orderService = new OrderService();
         
+        // Act
+        orderService.ClearDnaTestKitList();
+        List<DnaTestingKit> testingKitList = new List<DnaTestingKit>(orderService.DnaTestingKits);
+
+        // Assert that _dnaTestingKits list is empty 
+        Assert.IsFalse(testingKitList.Any());
     }
 }
