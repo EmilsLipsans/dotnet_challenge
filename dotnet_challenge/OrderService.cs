@@ -4,14 +4,14 @@ public class OrderService : IOrderService
 {
     private List<Order> _orders = new List<Order>();
     private List<DnaTestingKit> _dnaTestingKits = new List<DnaTestingKit>();
-    
+
     public Order PlaceOrder(int customerId, DateTime expectedDeliveryDate, int desiredAmount, int kitId)
     {
         if (expectedDeliveryDate <= DateTime.Now)
         {
             throw new ArgumentException("Expected delivery date must be in the future.");
         }
-        
+
         switch (desiredAmount)
         {
             case <= 0:
@@ -28,7 +28,7 @@ public class OrderService : IOrderService
             ExpectedDeliveryDate = expectedDeliveryDate,
             Amount = desiredAmount,
             KitId = kitId,
-            TotalPrice = CalculateTotalPrice(basePrice:GetKitBasePrice(kitId), desiredAmount:desiredAmount)
+            TotalPrice = CalculateTotalPrice(basePrice: GetKitBasePrice(kitId), desiredAmount: desiredAmount)
         };
 
         _orders.Add(order);
@@ -41,13 +41,14 @@ public class OrderService : IOrderService
         {
             throw new ArgumentException("Base price must be greater than zero.", nameof(basePrice));
         }
+
         if (desiredAmount <= 0)
         {
             throw new ArgumentException("Desired amount must be greater than zero.", nameof(desiredAmount));
         }
-        
+
         decimal totalPrice = basePrice * desiredAmount;
-        
+
         if (desiredAmount is >= 10 and < 50)
         {
             totalPrice *= 0.95m; // 5% discount
@@ -64,6 +65,7 @@ public class OrderService : IOrderService
     {
         return _dnaTestingKits.First(dnaTestingKit => dnaTestingKit.KitId == kitId).BasePrice;
     }
+
     private int GenerateOrderId()
     {
         if (_orders.Any())
@@ -71,18 +73,19 @@ public class OrderService : IOrderService
             // finds the largest index within _orders and returns index bigger by 1 
             return _orders.OrderByDescending(order => order.OrderId).First().OrderId + 1;
         }
+
         // If _orders is empty index order with 1
         return 1;
-
     }
+
     // Imports List of tuples containing int kitID, string kitVariant and decimal basePrice 
-    public void ImportDnaTestKitList(List<Tuple<int, string, decimal>>sourceData)
+    public void ImportDnaTestKitList(List<Tuple<int, string, decimal>> sourceData)
     {
         if (sourceData == null)
         {
             throw new ArgumentNullException(nameof(sourceData), "Source data cannot be null.");
         }
-        
+
         List<DnaTestingKit> copiedList = new List<DnaTestingKit>();
 
         foreach (var dataTuple in sourceData)
@@ -90,7 +93,7 @@ public class OrderService : IOrderService
             var kitId = dataTuple.Item1;
             var kitVariant = dataTuple.Item2;
             var basePrice = dataTuple.Item3;
-            
+
             DnaTestingKit copiedKit = new DnaTestingKit
             {
                 KitId = kitId,
@@ -100,9 +103,10 @@ public class OrderService : IOrderService
 
             copiedList.Add(copiedKit);
         }
+
         _dnaTestingKits = new List<DnaTestingKit>(copiedList);
     }
-    
+
     public List<Order> GetCustomerOrders(int customerId)
     {
         return _orders.Where(order => order.CustomerId == customerId).ToList();
