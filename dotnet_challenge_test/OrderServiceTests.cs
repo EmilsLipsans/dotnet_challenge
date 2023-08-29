@@ -182,24 +182,48 @@ public class OrderServiceTests
     }
 
     [TestMethod]
-    public void Import_DnaTestKitList_ImportsList()
+    public void ImportDnaTestKitList_ValidInput_ImportsList()
     {
         // Arrange 
-
         OrderService orderService = new OrderService();
+
         List<Tuple<int, string, decimal>> importList = new List<Tuple<int, string, decimal>>();
-        int expectedDnaTestKitCount = 4;
+
+        int expectedDnaTestKitCount = 2; // default kit and the imported kit
+
+        int kitId = 2;
+        string kitVariant = "Kit 2";
+        decimal basePrice = 20M;
 
         // Add 3 Tuples of DnaTestKit values to the import list 
-        importList.Add(new Tuple<int, string, decimal>(2, "Kit 2", 20M));
-        importList.Add(new Tuple<int, string, decimal>(3, "Kit 3", 30M));
-        importList.Add(new Tuple<int, string, decimal>(4, "Kit 4", 40M));
+        importList.Add(new Tuple<int, string, decimal>(kitId, kitVariant, basePrice));
 
         // Act
-
         orderService.ImportDnaTestKitList(importList);
 
         // Assert that _dnaTestingKits list is empty 
         Assert.AreEqual(expectedDnaTestKitCount, orderService.DnaTestingKits.Count);
+    }
+
+    public static IEnumerable<object[]> InvalidTestData()
+    {
+        yield return new object[] { 1, "Kit 2", 20.0M }; // kit id is already used
+        yield return new object[] { 2, "Kit 2", -10.0M }; // base price is not a positive number
+        // Add more test cases here
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(InvalidTestData), DynamicDataSourceType.Method)]
+    public void ImportDnaTestKitList_InvalidInput_ThrowsException(int kitId, string kitVariant, decimal basePrice)
+    {
+        // Arrange 
+        OrderService orderService = new OrderService();
+        List<Tuple<int, string, decimal>> importList = new List<Tuple<int, string, decimal>>();
+
+        // Add Tuple of DnaTestKit values to the import list 
+        importList.Add(new Tuple<int, string, decimal>(kitId, kitVariant, basePrice));
+
+        // Act and Assert 
+        Assert.ThrowsException<ArgumentException>(() => orderService.ImportDnaTestKitList(importList));
     }
 }

@@ -24,7 +24,7 @@ public class OrderService : IOrderService
             throw new ArgumentException("Expected delivery date must be in the future.");
         }
 
-        if (!IsValidKitId(kitId))
+        if (!IsKitId(kitId))
         {
             throw new ArgumentException(
                 "Invalid kit ID. The provided kit ID is not found in the list of available DNA testing kits.");
@@ -78,7 +78,7 @@ public class OrderService : IOrderService
         return totalPrice;
     }
 
-    private bool IsValidKitId(int kitId)
+    private bool IsKitId(int kitId)
     {
         return _dnaTestingKits.Any(dnaTestingKit => dnaTestingKit.KitId == kitId);
     }
@@ -107,13 +107,24 @@ public class OrderService : IOrderService
         {
             throw new ArgumentNullException(nameof(sourceData), "Source data cannot be null.");
         }
+        
 
         foreach (var dataTuple in sourceData)
         {
             var kitId = dataTuple.Item1;
             var kitVariant = dataTuple.Item2;
             var basePrice = dataTuple.Item3;
+            
+            if (IsKitId(kitId))
+            {
+                throw new ArgumentException( "Kit id must be unique.", nameof(basePrice));
+            }
 
+            if (basePrice <= 0)
+            {
+                throw new ArgumentException( "Base price must be greater than zero.", nameof(basePrice));
+            }
+            
             DnaTestingKit copiedKit = new DnaTestingKit
             {
                 KitId = kitId,
