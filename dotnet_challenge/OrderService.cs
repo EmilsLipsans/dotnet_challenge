@@ -24,6 +24,12 @@ public class OrderService : IOrderService
             throw new ArgumentException("Expected delivery date must be in the future.");
         }
 
+        if (!IsValidKitId(kitId))
+        {
+            throw new ArgumentException(
+                "Invalid kit ID. The provided kit ID is not found in the list of available DNA testing kits.");
+        }
+
         switch (desiredAmount)
         {
             case <= 0:
@@ -31,7 +37,6 @@ public class OrderService : IOrderService
             case > 999:
                 throw new ArgumentException("Desired amount must be less than 1000.");
         }
-
 
         Order order = new Order
         {
@@ -71,6 +76,11 @@ public class OrderService : IOrderService
         }
 
         return totalPrice;
+    }
+
+    private bool IsValidKitId(int kitId)
+    {
+        return _dnaTestingKits.Any(dnaTestingKit => dnaTestingKit.KitId == kitId);
     }
 
     private decimal GetKitBasePrice(int kitId)

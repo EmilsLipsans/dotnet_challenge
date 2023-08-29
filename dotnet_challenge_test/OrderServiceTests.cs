@@ -114,6 +114,26 @@ public class OrderServiceTests
     }
 
     [TestMethod]
+    [DataRow("2010-01-01", 1, 1)] // expected delivery date is in the past
+    [DataRow("2030-01-01", 1, 22)] // kit id does not exist in the list
+    [DataRow("2030-01-01", 0, 1)] // desiredAmount is 0
+    [DataRow("2030-01-01", 1000, 1)] // desiredAmount is over the 999 limit
+    public void PlaceOrder_InvalidInput_ThrowsException(string expectedDeliveryDateString, int desiredAmount, int kitId)
+    {
+        // Arrange 
+        OrderService orderService = new OrderService();
+        int customerId = 1;
+
+        DateTime expectedDeliveryDate = DateTime.Parse(expectedDeliveryDateString);
+
+        // Act and Assert
+        Assert.ThrowsException<ArgumentException>(() => orderService.PlaceOrder(customerId: customerId,
+            expectedDeliveryDate: expectedDeliveryDate,
+            desiredAmount: desiredAmount,
+            kitId: kitId));
+    }
+
+    [TestMethod]
     public void GetCustomerOrders_HasOrders_ReturnsOrders()
     {
         // Arrange 
@@ -125,11 +145,11 @@ public class OrderServiceTests
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
 
         // valid amount is from 1 to 999. 
-        int desiredAmount = 50;
+        int desiredAmount = 1;
 
         // valid kitId exists in the dictionary
         int kitId = 1;
-        
+
         int expectedOrderCount = 3;
 
         // Act 
@@ -146,17 +166,40 @@ public class OrderServiceTests
         // Assert that customer has expected order count 
         Assert.AreEqual(expectedOrderCount, customerOrders.Count);
     }
+
     [TestMethod]
     public void Clear_DnaTestKitList_ClearsList()
     {
         // Arrange 
         OrderService orderService = new OrderService();
-        
+
         // Act
         orderService.ClearDnaTestKitList();
         List<DnaTestingKit> testingKitList = new List<DnaTestingKit>(orderService.DnaTestingKits);
 
         // Assert that _dnaTestingKits list is empty 
         Assert.IsFalse(testingKitList.Any());
+    }
+
+    [TestMethod]
+    public void Import_DnaTestKitList_ImportsList()
+    {
+        // Arrange 
+
+        OrderService orderService = new OrderService();
+        List<Tuple<int, string, decimal>> importList = new List<Tuple<int, string, decimal>>();
+        int expectedDnaTestKitCount = 4;
+
+        // Add 3 Tuples of DnaTestKit values to the import list 
+        importList.Add(new Tuple<int, string, decimal>(2, "Kit 2", 20M));
+        importList.Add(new Tuple<int, string, decimal>(3, "Kit 3", 30M));
+        importList.Add(new Tuple<int, string, decimal>(4, "Kit 4", 40M));
+
+        // Act
+
+        orderService.ImportDnaTestKitList(importList);
+
+        // Assert that _dnaTestingKits list is empty 
+        Assert.AreEqual(expectedDnaTestKitCount, orderService.DnaTestingKits.Count);
     }
 }
