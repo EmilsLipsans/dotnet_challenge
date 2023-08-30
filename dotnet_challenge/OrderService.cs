@@ -91,14 +91,8 @@ public class OrderService : IOrderService
 
     private int GenerateOrderId()
     {
-        if (_orders.Any())
-        {
-            // Find the highest existing order ID within _orders and increment it by 1
-            return _orders.OrderByDescending(order => order.OrderId).First().OrderId + 1;
-        }
-
-        // If _orders is empty, start with order ID 1
-        return 1;
+        var maxOrderId = _orders.Any() ? _orders.Max(order => order.OrderId) : 0;
+        return maxOrderId + 1;
     }
 
     // Imports List of tuples containing int kit ID, string kit variant and decimal base price 
