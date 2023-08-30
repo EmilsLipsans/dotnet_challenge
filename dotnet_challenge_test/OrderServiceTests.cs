@@ -7,22 +7,15 @@ public class OrderServiceTests
 {
     private const decimal DefaultKitPrice = 98.99M;
 
-    // Using https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices as a guide i have implemented unit tests
+    // I have followed the guidelines from https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices to develop my unit tests.
     [TestMethod]
     public void PlaceOrder_ValidInput_ReturnsNoDiscountOrder()
     {
         // Arrange 
         OrderService orderService = new OrderService();
-
         int customerId = 1;
-
-        // valid order delivery date is in the future
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
-
-        // valid amount is from 1 to 999. order where amount is under 10 gets no discount
         int desiredAmount = 5;
-
-        // valid kitId exists in the dictionary
         int kitId = 1;
 
         // expected total price calculation with no discounts 
@@ -48,16 +41,9 @@ public class OrderServiceTests
     {
         // Arrange 
         OrderService orderService = new OrderService();
-
         int customerId = 1;
-
-        // valid order delivery date is in the future
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
-
-        // valid amount is from 1 to 999. order where amount is 10-49 gets 5% discount
         int desiredAmount = 10;
-
-        // valid kitId exists in the dictionary
         int kitId = 1;
 
         // expected total price calculation with 5% discount 
@@ -83,16 +69,9 @@ public class OrderServiceTests
     {
         // Arrange 
         OrderService orderService = new OrderService();
-
         int customerId = 1;
-
-        // valid order delivery date is in the future
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
-
-        // valid amount is from 1 to 999. order where amount is 50 or more gets 15% discount
         int desiredAmount = 50;
-
-        // valid kitId exists in the dictionary
         int kitId = 1;
 
         // expected total price calculation with 15% discount 
@@ -114,10 +93,10 @@ public class OrderServiceTests
     }
 
     [TestMethod]
-    [DataRow("2010-01-01", 1, 1)] // expected delivery date is in the past
-    [DataRow("2030-01-01", 1, 22)] // kit id does not exist in the list
-    [DataRow("2030-01-01", 0, 1)] // desiredAmount is 0
-    [DataRow("2030-01-01", 1000, 1)] // desiredAmount is over the 999 limit
+    [DataRow("2010-01-01", 1, 1)] // Expected delivery date is in the past
+    [DataRow("2030-01-01", 1, 22)] // Kit id does not exist in the list
+    [DataRow("2030-01-01", 0, 1)] // DesiredAmount is 0
+    [DataRow("2030-01-01", 1000, 1)] // DesiredAmount is over the 999 limit
     public void PlaceOrder_InvalidInput_ThrowsException(string expectedDeliveryDateString, int desiredAmount, int kitId)
     {
         // Arrange 
@@ -138,18 +117,10 @@ public class OrderServiceTests
     {
         // Arrange 
         OrderService orderService = new OrderService();
-
         int customerId = 1;
-
-        // valid order delivery date is in the future
         DateTime expectedDeliveryDate = DateTime.Now.AddDays(5);
-
-        // valid amount is from 1 to 999. 
         int desiredAmount = 1;
-
-        // valid kitId exists in the dictionary
         int kitId = 1;
-
         int expectedOrderCount = 3;
 
         // Act 
@@ -189,7 +160,7 @@ public class OrderServiceTests
 
         List<Tuple<int, string, decimal>> importList = new List<Tuple<int, string, decimal>>();
 
-        int expectedDnaTestKitCount = 2; // default kit and the imported kit
+        int expectedDnaTestKitCount = 2; // Default kit and the imported kit
 
         int kitId = 2;
         string kitVariant = "Kit 2";
@@ -207,9 +178,8 @@ public class OrderServiceTests
 
     public static IEnumerable<object[]> InvalidTestData()
     {
-        yield return new object[] { 1, "Kit 2", 20.0M }; // kit id is already used
-        yield return new object[] { 2, "Kit 2", -10.0M }; // base price is not a positive number
-        // Add more test cases here
+        yield return new object[] { 1, "Kit 2", 20.0M }; // Kit id is already used
+        yield return new object[] { 2, "Kit 2", -10.0M }; // Base price is not a positive number
     }
 
     [TestMethod]
@@ -225,5 +195,16 @@ public class OrderServiceTests
 
         // Act and Assert 
         Assert.ThrowsException<ArgumentException>(() => orderService.ImportDnaTestKitList(importList));
+    }
+
+    [TestMethod]
+    public void ImportDnaTestKitList_EmptyInput_ThrowsException()
+    {
+        // Arrange 
+        OrderService orderService = new OrderService();
+        List<Tuple<int, string, decimal>> importList = new List<Tuple<int, string, decimal>>();
+
+        // Act and Assert 
+        Assert.ThrowsException<ArgumentNullException>(() => orderService.ImportDnaTestKitList(importList));
     }
 }
