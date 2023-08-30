@@ -6,6 +6,7 @@ public class OrderService : IOrderService
     private List<DnaTestingKit> _dnaTestingKits = new List<DnaTestingKit>();
     public List<DnaTestingKit> DnaTestingKits => _dnaTestingKits;
 
+    // Include the standard DNA testing kit in the list during object instantiation
     public OrderService()
     {
         DnaTestingKit defaultKit = new DnaTestingKit
@@ -38,7 +39,7 @@ public class OrderService : IOrderService
                 throw new ArgumentException("Desired amount must be less than 1000.");
         }
 
-        Order order = new Order
+        var order = new Order
         {
             OrderId = GenerateOrderId(),
             CustomerId = customerId,
@@ -92,39 +93,38 @@ public class OrderService : IOrderService
     {
         if (_orders.Any())
         {
-            // finds the largest index within _orders and returns index bigger by 1 
+            // Find the highest existing order ID within _orders and increment it by 1
             return _orders.OrderByDescending(order => order.OrderId).First().OrderId + 1;
         }
 
-        // If _orders is empty index order with 1
+        // If _orders is empty, start with order ID 1
         return 1;
     }
 
-    // Imports List of tuples containing int kitID, string kitVariant and decimal basePrice 
+    // Imports List of tuples containing int kit ID, string kit variant and decimal base price 
     public void ImportDnaTestKitList(List<Tuple<int, string, decimal>> sourceData)
     {
-        if (sourceData == null)
+        if (!sourceData.Any())
         {
             throw new ArgumentNullException(nameof(sourceData), "Source data cannot be null.");
         }
         
-
         foreach (var dataTuple in sourceData)
         {
             var kitId = dataTuple.Item1;
             var kitVariant = dataTuple.Item2;
             var basePrice = dataTuple.Item3;
-            
+
             if (IsKitId(kitId))
             {
-                throw new ArgumentException( "Kit id must be unique.", nameof(basePrice));
+                throw new ArgumentException("Kit id must be unique.", nameof(basePrice));
             }
 
             if (basePrice <= 0)
             {
-                throw new ArgumentException( "Base price must be greater than zero.", nameof(basePrice));
+                throw new ArgumentException("Base price must be greater than zero.", nameof(basePrice));
             }
-            
+
             DnaTestingKit copiedKit = new DnaTestingKit
             {
                 KitId = kitId,
