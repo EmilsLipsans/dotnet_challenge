@@ -18,7 +18,7 @@ public class OrderServiceTests
         int desiredAmount = 5;
         int kitId = 1;
 
-        // expected total price calculation with no discounts 
+        // Expected total price calculation with no discounts 
         decimal expectedTotalPrice = desiredAmount * DefaultKitPrice;
 
         // Act
@@ -46,7 +46,7 @@ public class OrderServiceTests
         int desiredAmount = 10;
         int kitId = 1;
 
-        // expected total price calculation with 5% discount 
+        // Expected total price calculation with 5% discount 
         decimal expectedTotalPrice = desiredAmount * DefaultKitPrice * 0.95M;
 
         // Act
@@ -74,7 +74,7 @@ public class OrderServiceTests
         int desiredAmount = 50;
         int kitId = 1;
 
-        // expected total price calculation with 15% discount 
+        // Expected total price calculation with 15% discount 
         decimal expectedTotalPrice = desiredAmount * DefaultKitPrice * 0.85M;
 
         // Act
@@ -166,7 +166,7 @@ public class OrderServiceTests
         string kitVariant = "Kit 2";
         decimal basePrice = 20M;
 
-        // Add 3 Tuples of DnaTestKit values to the import list 
+        // Add a Tuple of DnaTestKit values to the import list 
         importList.Add(new Tuple<int, string, decimal>(kitId, kitVariant, basePrice));
 
         // Act

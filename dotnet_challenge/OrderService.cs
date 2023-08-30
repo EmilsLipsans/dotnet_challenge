@@ -12,7 +12,7 @@ public class OrderService : IOrderService
         DnaTestingKit defaultKit = new DnaTestingKit
         {
             KitId = 1,
-            KitVariant = "default Kit",
+            KitVariant = "Default kit",
             BasePrice = 98.99M
         };
         _dnaTestingKits.Add(defaultKit);
